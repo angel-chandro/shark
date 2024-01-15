@@ -269,7 +269,7 @@ void SharkRunner::impl::create_per_thread_objects()
 std::vector<MergerTreePtr> SharkRunner::impl::import_trees()
 {
 	Timer t;
-	SURFSReader reader(simulation_params.tree_files_prefix, dark_matter_halos, simulation_params, threads);
+	SURFSReader reader(simulation_params.tree_files_prefix, dark_matter_halos, simulation_params, threads, simulation_params.mask_prefix, simulation_params.mask_name);
 	HaloBasedTreeBuilder tree_builder(exec_params, threads);
 	auto halos = reader.read_halos(exec_params.simulation_batches);
 	auto trees = tree_builder.build_trees(halos, simulation_params, gas_cooling_params, dark_matter_halo_params, dark_matter_halos, cosmology, all_baryons);

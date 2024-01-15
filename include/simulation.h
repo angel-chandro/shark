@@ -55,6 +55,8 @@ public:
 
 	bool hydrorun = false;
 
+	std::string mask_prefix {"mask."};
+	std::string mask_name;
 
 	void load_simulation_tables(const std::string &redshift_file);
 };

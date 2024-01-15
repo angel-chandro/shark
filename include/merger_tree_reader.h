@@ -42,7 +42,7 @@ public:
 	 *
 	 * @param trees_dir Directory where all tree files are located
 	 */
-	SURFSReader(const std::string &prefix, DarkMatterHalosPtr dark_matter_halos, SimulationParameters simulation_params, unsigned int threads);
+  SURFSReader(const std::string &prefix, DarkMatterHalosPtr dark_matter_halos, SimulationParameters simulation_params, unsigned int threads, const std::string &mask_prefix, const std::string &mask_name);
 
 	const std::vector<HaloPtr> read_halos(std::vector<unsigned int> batches);
 
@@ -51,10 +51,13 @@ private:
 	DarkMatterHalosPtr dark_matter_halos;
 	SimulationParameters simulation_params;
 	unsigned int threads;
+	std::string mask_prefix;
+	std::string mask_name;
 
 	const std::vector<HaloPtr> read_halos(unsigned int batch);
 	const std::vector<SubhaloPtr> read_subhalos(unsigned int batch);
 	const std::string get_filename(unsigned int batch);
+	const std::string get_mask_filename(unsigned int batch);
 
 };
 
