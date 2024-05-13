@@ -47,6 +47,8 @@ void adjust_main_galaxy(const SubhaloPtr &parent, const SubhaloPtr &descendant)
 	// Define the stellar content of the central at the moment of infall. So this applies only to subhalos that are currently central but will become
 	// satellite in the next snapshot. In this case also transfer stellar halo of the subhalo to the main progenitor subhalo.
 	if(parent_is_central && !desc_is_central){
+		main_galaxy->star_central_infall.mass = main_galaxy->stellar_mass();
+		main_galaxy->star_central_infall.mass_metals = main_galaxy->stellar_mass_metals();
 		descendant->star_central_infall.mass = main_galaxy->stellar_mass();
 		descendant->star_central_infall.mass_metals = main_galaxy->stellar_mass_metals();
 		//if subhalo will become a satellite subhalo then transfer the stellar_halo.
@@ -71,6 +73,8 @@ void adjust_main_galaxy(const SubhaloPtr &parent, const SubhaloPtr &descendant)
 
 	// If main_galaxy is type 2, then define subhalo properties of types 2.
 	if (main_galaxy->galaxy_type == Galaxy::TYPE2) {
+		main_galaxy->star_central_infall.mass = main_galaxy->stellar_mass();
+		main_galaxy->star_central_infall.mass_metals = main_galaxy->stellar_mass_metals();
 		main_galaxy->concentration_type2 = parent->concentration;
 		main_galaxy->msubhalo_type2 = parent->Mvir;
 		main_galaxy->lambda_type2 = parent->lambda;
@@ -99,8 +103,16 @@ void transfer_galaxies_to_next_snapshot(const std::vector<HaloPtr> &halos, int s
 	}
 
 	for(auto &halo: halos){
+	  //	        auto i = 0;
 		for(auto &subhalo: halo->all_subhalos()) {
 
+		  //	        std::ostringstream os;
+		  //    os << "Subhalo " << subhalo;
+		  //    LOG(warning) << os.str();
+		  //    if(subhalo->subhalo_type == Subhalo::CENTRAL){
+		  //	        i++;
+		  //    }
+		  
 			// Make sure all SFRs and BH accretion rates (in mass and metals) are set to 0 for the next snapshot
 			for (auto &galaxy: subhalo->galaxies) {
 				//restart descendant_id
@@ -156,6 +168,14 @@ void transfer_galaxies_to_next_snapshot(const std::vector<HaloPtr> &halos, int s
 				descendant_subhalo->cooling_subhalo_tracking = subhalo->cooling_subhalo_tracking;
 			}
 		}
+		//		std::ostringstream os;
+		//os << "Halo " << halo << " has " << i <<" central subhalos (should be == 1)";
+		//LOG(warning) << os.str();
+		//if ((i > 1)|(i == 0)) {
+		//  std::ostringstream os;
+		//  os << "Halo " << halo << " has " << i <<" central subhalos (should be == 1)";
+		//  throw invalid_data(os.str());
+		//}
 	}
 
 	// Now that descendants have been fully populated they should be correctly composed

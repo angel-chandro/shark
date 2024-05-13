@@ -132,6 +132,9 @@ void Subhalo::do_check_central_subhalo_galaxy_composition() const
 
 	auto n_central = 0;
 	for(const auto &g: galaxies) {
+	  //	        std::ostringstream os;
+	  //    os << "Galaxy " << g << " with ID " << g.id << " has type " << g.galaxy_type;	  
+	  //    LOG(warning) << os.str();
 		if (g.galaxy_type == Galaxy::TYPE1) {
 			std::ostringstream os;
 			os << "Central subhalo " << *this << " has at least one type 1 galaxy";
@@ -141,6 +144,9 @@ void Subhalo::do_check_central_subhalo_galaxy_composition() const
 			n_central++;
 		}
 	}
+	//	std::ostringstream os;
+	//os << "Central subhalo " << *this << " has " << n_central << " central galaxy";
+	//LOG(warning) << os.str();
 
 	if (n_central == 0 && galaxy_count() > 0) {
 		std::ostringstream os;

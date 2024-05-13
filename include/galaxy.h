@@ -142,7 +142,9 @@ public:
 	// ram-pressure stripping radius
 	float r_rps = 0;
 	BaryonBase ram_pressure_stripped_gas;
-
+        // stellar mass at infall (before the galaxy become a satellite)
+        BaryonBase star_central_infall; 
+  
 	/// star formation and gas history of this galaxy across snapshots
 	std::vector<HistoryItem> history;
 
@@ -291,7 +293,6 @@ public:
 		if(baryon_mass() > 0){
 			rcomp = (disk_stars.mass * rdisk + bulge_mass() * rbulge) / baryon_mass();
 		}
-
 		return rcomp;
 	}
 
