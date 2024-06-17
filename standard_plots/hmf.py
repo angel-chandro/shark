@@ -167,7 +167,7 @@ def main(model_dir, outdir, redshift_table, subvols, obsdir):
     fields = {'galaxies': ('mstars_disk', 'mstars_bulge', 'mvir_hosthalo',
                            'mvir_subhalo', 'type')}
 
-    z = (0, 0.5, 1, 2, 6, 10)
+    z = (0, 0.5, 1, 2, 3, 4, 5, 7, 10)
     snapshots = redshift_table[z]
 
     # Create histogram

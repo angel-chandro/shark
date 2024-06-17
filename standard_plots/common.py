@@ -242,7 +242,7 @@ def errorbars(ax, x, y, yerrdn, yerrup, color, marker,
                 marker=marker, **kwargs)
 
 def savefig(output_dir, fig, plotname):
-    if not plotname.endswith('.pdf'):
+    if not plotname.endswith('.pdf') and not plotname.endswith('.png'):
         plotname += '.pdf'
     plotfile = os.path.join(output_dir, plotname)
     logger.info('Saving plot to %s', plotfile)
