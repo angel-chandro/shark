@@ -77,6 +77,7 @@ dsfr = 0.2
 sfrbins = np.arange(sfrlow,sfrupp,dsfr)
 xsfr    = sfrbins + dsfr/2.0
 
+# plotting options
 size1 = 27
 size2 = 9
 stext = 40
@@ -91,9 +92,12 @@ spadx = 8
 spady = 8
 col = 'dodgerblue'
 
+# SFMS fits
 logMstars = np.linspace(8.5,11.5,20)
 
 def sfms_fit_popesso23(t):
+    # Popesso+23: fit to the SFMS at different redhifts z=0-6
+    # (compilation of different literature studies)
     # fit in the stellar mass range (10^8.5-10^11.5Msun)
     # t is the age of the Universe in Gyr
     logMstars = np.linspace(8.5,11.5,20)
@@ -105,6 +109,7 @@ def sfms_fit_popesso23(t):
     return (a1*t + b1)*logMstars + b2*(logMstars)**2 + (b0 + a0*t)
 
 def sfms_fit_schreiber15(m,z):
+    # Schreiber+15: fit to the SFMS at different redhifts
     # fit in the stellar mass range (10^8.5-10^11.5Msun)
     # z is redshift
     r = np.log10(1 + z)
@@ -116,6 +121,20 @@ def sfms_fit_schreiber15(m,z):
     a2 = 2.5
     return m - m0 + a0*r - a1*(np.maximum.reduce([np.zeros(np.shape(m)),m - m1 - a2*r]))**2
 
+def setup_subplot(ax, xmin, xmax, ymin, ymax, xtit, ytit, show_yticks=True):
+    common.prepare_ax(ax, xmin, xmax, ymin, ymax, xtit, ytit, locators=(0.1, 1, 0.1, 1))
+    ax.set_xlim(xmin,xmax)
+    ax.set_ylim(ymin,ymax)
+    ax.set_xticks(np.arange(8,13,1))
+    ax.set_xticks(np.arange(8,13,0.2),minor=True)
+    ax.set_xlabel(xtit,fontsize=linw3,labelpad=spadx)
+    if show_yticks:
+        ax.set_yticks(np.arange(-3,4,1))
+        ax.set_ylabel(ytit,fontsize=linw3,labelpad=spady)
+    else:
+        ax.set_yticks(np.arange(-3,4,1),[])
+    ax.set_yticks(np.arange(-3,3.4,0.2),[],minor=True)
+    ax.tick_params(axis='both', which='major', labelsize=saxis)
 
 def plot_sfms(plt, outdir, h0, omega_m, omega_b, obsdir, mainseqsf_1):
 
@@ -138,7 +157,7 @@ def plot_sfms(plt, outdir, h0, omega_m, omega_b, obsdir, mainseqsf_1):
     yleg = ymax - 0.5 * (ymax-ymin)
     
     ax = plt.subplot(gs[0])
-    common.prepare_ax(ax, xmin, xmax, ymin, ymax, xtit, ytit, locators=(0.1, 1, 0.1, 1))
+    setup_subplot(ax, xmin, xmax, ymin, ymax, xtit, ytit)
 
     index = 0
     ind = np.where(mainseqsf_1[index,0,:] != 0)
@@ -176,16 +195,7 @@ def plot_sfms(plt, outdir, h0, omega_m, omega_b, obsdir, mainseqsf_1):
         ax.arrow(a, b, 0, -0.3, head_width=0.05, head_length=0.1, fc='r', ec='r')
 
         
-    ax.set_xlim(xmin,xmax)
-    ax.set_ylim(ymin,ymax)
-    ax.set_xticks(np.arange(8,13,1))
-    ax.set_xticks(np.arange(8,13,0.2),minor=True)
-    ax.set_xlabel(xtit,fontsize=linw3,labelpad=spadx)
-    ax.set_yticks(np.arange(-3,4,1))
-    ax.set_yticks(np.arange(-3,3.4,0.2),[],minor=True)
     ax.text(xleg,yleg, 'z=0' ,fontsize=stext)
-    ax.tick_params(axis='both', which='major', labelsize=saxis)
-    ax.set_ylabel(ytit,fontsize=linw3,labelpad=spady)
     # Legend
     plt.tight_layout()
     ax.legend(loc=2, prop={'size': fsize}, frameon=False)
@@ -193,8 +203,7 @@ def plot_sfms(plt, outdir, h0, omega_m, omega_b, obsdir, mainseqsf_1):
     yleg = ymax - 0.25 * (ymax-ymin)
 
     ax = plt.subplot(gs[1])
-    common.prepare_ax(ax, xmin, xmax, ymin, ymax, xtit, '', locators=(0.1, 1, 0.1, 1))
-    ax.set_yticks([])
+    setup_subplot(ax, xmin, xmax, ymin, ymax, xtit, '', show_yticks=False)
     index = 1
     ind = np.where(mainseqsf_1[index,0,:] != 0)
     yp = mainseqsf_1[index,0,ind]
@@ -205,15 +214,7 @@ def plot_sfms(plt, outdir, h0, omega_m, omega_b, obsdir, mainseqsf_1):
     ax.plot(logMstars,sfms_fit_popesso23(LBT_end-LBT_1),color='orange',linestyle='dashed', linewidth = 5)
     mstars = np.logspace(8,13,100) 
     #ax.plot(np.log10(mstars),sfms_fit_schreiber15(mstars,1),color='olive',linestyle='dashed', linewidth = 5, label="Schreiber+15 MS fit")
-    ax.set_xlim(xmin,xmax)
-    ax.set_ylim(ymin,ymax)
-    ax.set_xticks(np.arange(8,13,1))
-    ax.set_xticks(np.arange(8,13,0.2),minor=True)
-    ax.set_xlabel(xtit,fontsize=linw3,labelpad=spadx)
-    ax.set_yticks(np.arange(-3,4,1),[])
-    ax.set_yticks(np.arange(-3,3.4,0.2),[],minor=True)
     ax.text(xleg,yleg, 'z=1' ,fontsize=stext)
-    ax.tick_params(axis='both', which='major', labelsize=saxis)
     # Legend
     plt.tight_layout()
     ax.legend(loc=2, prop={'size': fsize}, frameon=False)
@@ -221,8 +222,7 @@ def plot_sfms(plt, outdir, h0, omega_m, omega_b, obsdir, mainseqsf_1):
     yleg = ymax - 0.25 * (ymax-ymin)
 
     ax = plt.subplot(gs[2])
-    common.prepare_ax(ax, xmin, xmax, ymin, ymax, xtit, '', locators=(0.1, 1, 0.1, 1))
-    ax.set_yticks([])
+    setup_subplot(ax, xmin, xmax, ymin, ymax, xtit, '', show_yticks=False)
     index = 2
     ind = np.where(mainseqsf_1[index,0,:] != 0)
     yp = mainseqsf_1[index,0,ind]
@@ -232,15 +232,7 @@ def plot_sfms(plt, outdir, h0, omega_m, omega_b, obsdir, mainseqsf_1):
     ax.plot(xmf[ind], yp[0],color=col,linestyle='solid', linewidth = linw1, label="Shark before", path_effects=[pe.Stroke(linewidth=linw1+1, foreground='k'), pe.Normal()])
     ax.plot(logMstars,sfms_fit_popesso23(LBT_end-LBT_2),color='orange',linestyle='dashed', linewidth = 5, label="Popesso+23")
     #ax.plot(np.log10(mstars),sfms_fit_schreiber15(mstars,2),color='olive',linestyle='dashed', linewidth = 5, label="Schreiber+15")
-    ax.set_xlim(xmin,xmax)
-    ax.set_ylim(ymin,ymax)
-    ax.set_xticks(np.arange(8,13,1))
-    ax.set_xticks(np.arange(8,13,0.2),minor=True)
-    ax.set_xlabel(xtit,fontsize=linw3,labelpad=spadx)
-    ax.set_yticks(np.arange(-3,4,1),[])
-    ax.set_yticks(np.arange(-3,3.4,0.2),[],minor=True)
     ax.text(xleg,yleg, 'z=2' ,fontsize=stext)
-    ax.tick_params(axis='both', which='major', labelsize=saxis)
     # Legend
     plt.tight_layout()
 
