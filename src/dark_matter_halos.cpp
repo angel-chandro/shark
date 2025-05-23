@@ -53,6 +53,8 @@ DarkMatterHaloParameters::DarkMatterHaloParameters(const Options &options)
 	options.load("dark_matter_halo.min_part_convergence", min_part_convergence);
 	options.load("dark_matter_halo.spin_mass_dependence", spin_mass_dependence);
 	options.load("dark_matter_halo.apply_fix_to_mass_swapping_events", apply_fix_to_mass_swapping_events);
+	options.load("dark_matter_halo.riera_spin_evolution", riera_spin_evolution);
+	options.load("dark_matter_halo.riera_spin_evolution_definition", riera_spin_evolution_definition);
 }
 
 template <>
@@ -221,6 +223,28 @@ float DarkMatterHalos::halo_lambda (Subhalo &subhalo, float m, double z, double 
 	}
  
 }
+
+double DarkMatterHalos::riera_spin_evolution(double lambda_z0, double z0, double z){
+
+        // Spin evolution following the results from Riera for the Peebles and Bullock halo spin parameter
+        // given the spin at z=0 and the specific redshift
+        double lP = -7.043e-2, lB = -3.964e-2;
+	double a = 7.947e-1, b = -2.045;
+	double lambda_z;
+
+	// Peebles spin evolution
+	if(params.riera_spin_evolution_definition == DarkMatterHaloParameters::PEEBLES){
+	        lambda_z = std::exp(std::log(lambda_z0) - lP*z0 + lP*z);
+	}
+	// Bullock spin evolution
+	else if(params.riera_spin_evolution_definition == DarkMatterHaloParameters::BULLOCK){
+	        lambda_z = std::exp(std::log(lambda_z0) - lB*z0 - std::log((1+std::exp(a*b))/(1+std::exp(-a*(z0-b)))) + lB*z + std::log((1+std::exp(a*b))/(1+std::exp(-a*(z-b)))));
+	}
+	
+	return lambda_z;
+ 
+}
+
 
 void DarkMatterHalos::redefine_angular_momentum(Subhalo &subhalo, double lambda, double z){
 
@@ -625,6 +649,22 @@ void DarkMatterHalos::generate_random_orbits(xyz<float> &pos, xyz<float> &v, xyz
 	// Assign angular momentum based on random angles,
 	L = random_point_in_sphere(total_am, generator);
 
+}
+
+template <>
+DarkMatterHaloParameters::RieraSpinEvolutionDefinition
+Options::get<DarkMatterHaloParameters::RieraSpinEvolutionDefinition>(const std::string &name, const std::string &value) const {
+        auto lvalue = lower(value);
+        if (lvalue == "peebles") {
+	        return DarkMatterHaloParameters::PEEBLES;
+        }
+        else if (lvalue == "bullock") {
+	        return DarkMatterHaloParameters::BULLOCK;
+        }
+	
+        std::ostringstream os;
+        os << name << " option value invalid: " << value << ". Supported values are peebles, bullock";
+        throw invalid_option(os.str());
 }
 
 } // namespace shark

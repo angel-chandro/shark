@@ -109,7 +109,7 @@ public:
 	    dark_matter_halos(make_dark_matter_halos(dark_matter_halo_params, cosmology, simulation_params, exec_params)),
 	    agn_feedback_params(options),
 	    agn_feedback(make_agn_feedback(agn_feedback_params, cosmology, recycling_params, exec_params, dark_matter_halo_params)),
-	    writer(make_galaxy_writer(exec_params, cosmo_params, cosmology, dark_matter_halos, simulation_params, agn_feedback_params, agn_feedback)),
+	    writer(make_galaxy_writer(exec_params, cosmo_params, cosmology, dark_matter_halos, dark_matter_halo_params, simulation_params, agn_feedback_params, agn_feedback)),
 	    simulation(simulation_params, cosmology),
 	    star_formation(star_formation_params, recycling_params, cosmology)
 	{
@@ -470,7 +470,7 @@ void SharkRunner::impl::evolve_merger_trees(const std::vector<std::vector<Merger
 
 	/*transfer galaxies from this halo->subhalos to the next snapshot's halo->subhalos*/
 	LOG(debug) << "Transferring all galaxies for snapshot " << snapshot << " into next snapshot";
-	transfer_galaxies_to_next_snapshot(all_halos_this_snapshot, snapshot, all_baryons);
+	transfer_galaxies_to_next_snapshot(all_halos_this_snapshot, snapshot, all_baryons, dark_matter_halo_params);
 
 	// Collect next snapshot's halos across all merger trees
 	// We keep them sorted so when output files are created the order in which

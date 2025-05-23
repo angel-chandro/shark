@@ -72,6 +72,13 @@ public:
 	bool use_converged_lambda_catalog = false; 
 	bool apply_fix_to_mass_swapping_events = true;
 	int  min_part_convergence = 100;
+	bool riera_spin_evolution = false;
+        // definition for the spin parameter evolution
+        enum RieraSpinEvolutionDefinition {
+                PEEBLES = 0,
+                BULLOCK
+        };
+        RieraSpinEvolutionDefinition riera_spin_evolution_definition = PEEBLES;
 
 };
 
@@ -100,6 +107,8 @@ public:
 	double halo_virial_velocity (double mvir, double redshift);
 
 	float halo_lambda (Subhalo &subhalo, float m, double z, double npart);
+
+        double riera_spin_evolution(double lambda_z0, double z0, double z);
 
 	void redefine_angular_momentum(Subhalo &subhalo, double lambda, double z);
 

@@ -51,11 +51,12 @@
 namespace shark {
 
 GalaxyWriter::GalaxyWriter(ExecutionParameters exec_params, CosmologicalParameters cosmo_params,  CosmologyPtr cosmology, DarkMatterHalosPtr darkmatterhalo,
-		SimulationParameters sim_params, AGNFeedbackParameters agn_params, AGNFeedbackPtr agn_feedback):
+	        DarkMatterHaloParameters dark_matter_params, SimulationParameters sim_params, AGNFeedbackParameters agn_params, AGNFeedbackPtr agn_feedback):
 	exec_params(std::move(exec_params)),
 	cosmo_params(std::move(cosmo_params)),
 	cosmology(std::move(cosmology)),
 	darkmatterhalo(std::move(darkmatterhalo)),
+	dark_matter_params(std::move(dark_matter_params)),
 	sim_params(std::move(sim_params)),
 	agn_params(std::move(agn_params)),
 	agn_feedback(std::move(agn_feedback))
@@ -350,6 +351,10 @@ void HDF5GalaxyWriter::write_galaxies(hdf5::Writer &file, int snapshot, const st
 			auto cnfw     = subhalo->concentration;
 			auto lambda   = subhalo->lambda;
 			auto vvir_sh  = subhalo->Vvir;
+			auto msubhalo_infall = subhalo->Mvir_infall;
+			auto cnfw_infall     = subhalo->concentration_infall;
+			auto lambda_infall   = subhalo->lambda_infall;
+			auto vvir_sh_infall  = subhalo->Vvir_infall;
 
 			// Assign baryon properties of subhalo (note that here we use the subhalo as galaxies and baryons have not yet been transferred to the descendant)
 			auto hot_subhalo = subhalo->hot_halo_gas;
@@ -540,16 +545,28 @@ void HDF5GalaxyWriter::write_galaxies(hdf5::Writer &file, int snapshot, const st
 				xyz<float> L;
 
 				if(galaxy.galaxy_type == Galaxy::CENTRAL || galaxy.galaxy_type == Galaxy::TYPE1){
-					mvir_gal = msubhalo;
-					c_sub    = cnfw;
-					l_sub    = lambda;
-					pos      = subhalo->position;
+				        pos      = subhalo->position;
 					vel      = subhalo->velocity;
-					L        = subhalo->L.unit() * galaxy.angular_momentum();
-					vvir_subhalo.push_back(vvir_sh);
-					mvir_subhalo.push_back(mvir_gal);
-					cnfw_subhalo.push_back(c_sub);
-					lambda_subhalo.push_back(l_sub);
+					if(galaxy.galaxy_type == Galaxy::TYPE1 && dark_matter_params.apply_fix_to_mass_swapping_events){
+					        mvir_gal = msub_infall;
+						c_sub    = cnfw_infall;
+						L        = subhalo->L_infall.unit() * galaxy.angular_momentum();
+					        l_sub    = lambda_infall;
+						vvir_subhalo.push_back(vvir_sh_infall);
+						mvir_subhalo.push_back(mvir_gal);
+						cnfw_subhalo.push_back(c_sub);
+					        lambda_subhalo.push_back(l_sub);
+					}
+					else{
+					        mvir_gal = msubhalo;
+						c_sub    = cnfw;
+						L        = subhalo->L.unit() * galaxy.angular_momentum();
+					        l_sub = lambda;
+						vvir_subhalo.push_back(vvir_sh);
+						mvir_subhalo.push_back(mvir_gal);
+						cnfw_subhalo.push_back(c_sub);
+					        lambda_subhalo.push_back(l_sub);
+					}
 					redshift_of_merger.push_back(-1);
 					if(galaxy.descendant_id < 0 && snapshot < sim_params.max_snapshot){
 						galaxy.descendant_id = galaxy.id;
